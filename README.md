@@ -7,7 +7,7 @@ Available models:
 
 + `sgd`: SGD with no countermeasure to catastrophic forgetting (lower bound)
 + `joint`: joint training on the whole dataset (upper bound - not continual)
-+ `a-gem`: [A-GEM](https://arxiv.org/abs/1812.00420)
++ `agem`: [A-GEM](https://arxiv.org/abs/1812.00420)
 + `gem`: [Gradient Episodic Memory for Continual Learning](https://arxiv.org/abs/1706.08840)
 + `hal`: [Hindisght Anchor Learning](https://arxiv.org/abs/2002.08165)
 + `iCaRL`: [Incremental Classifier and Representation Learning](https://arxiv.org/abs/1611.07725)
