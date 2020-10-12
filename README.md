@@ -1,5 +1,5 @@
 # Rethinking Experience Replay: a Bag of Tricks for Continual Learning
-An extendible framework for Continual Learning.
+This code is based on our framework: [Mammoth - An Extendible Continual Learning Framework for Pytorch](https://github.com/aimagelab/mammoth).
 
 To run experiments with the default arguments use `python ./utils/main.py --model=<MODEL> --dataset=<DATASET> --buffer_size=<MEM_BUFFER_SIZE> --load_best_args`.
 
