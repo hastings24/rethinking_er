@@ -1,12 +1,8 @@
-# Copyright 2020-present, Pietro Buzzega, Matteo Boschini, Angelo Porrello, Simone Calderara.
-# All rights reserved.
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
 # Copyright 2017-present, Facebook, Inc.
 # All rights reserved.
 #
 # This source code is licensed under the license found in the
-# LICENSE file in the gem_license file in the root of this source tree.
+# LICENSE file in the GEM_LICENSE file in the root of this source tree.
 from sys import platform
 if platform == "linux" or platform == "linux2":
     import quadprog
