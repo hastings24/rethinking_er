@@ -1,3 +1,7 @@
+# Copyright 2020-present, Pietro Buzzega, Matteo Boschini, Angelo Porrello, Simone Calderara.
+# All rights reserved.
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
 best_args = {'seq-cifar10': {'sgd': {-1: {'lr': 0.1,
                                           'batch_size': 32,
                                           'n_epochs': 50}},
