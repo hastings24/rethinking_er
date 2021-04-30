@@ -18,7 +18,7 @@ pyasn1-modules==0.2.8
 quadprog==0.1.7
 requests==2.22.0
 requests-oauthlib==1.3.0
-rsa==4.0
+rsa==4.7
 six==1.14.0
 tensorboard==2.0.1
 torch==1.3.1
