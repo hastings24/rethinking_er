@@ -12,7 +12,7 @@ Markdown==3.2.1
 numpy==1.16.4
 oauthlib==3.1.0
 Pillow==6.1.0
-protobuf==3.11.3
+protobuf==3.18.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 quadprog==0.1.7
