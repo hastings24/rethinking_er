@@ -151,7 +151,6 @@ def train(model: ContinualModel, dataset: ContinualDataset,
             print('skipping epoch', epoch, file=sys.stderr)
             continue
         for i, data in enumerate(train_loader):
-            if i > 3: continue
             if epoch < model_stash['epoch_idx'] and i < model_stash['batch_idx']:
                 print('batch', epoch, file=sys.stderr)
                 continue
