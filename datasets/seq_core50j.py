@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from utils.conf import base_path
 from PIL import Image
 import socket
+from datasets.seq_core50 import Core50
 import os
 import time
 from datasets.utils.validation import get_train_val
@@ -22,52 +23,13 @@ import sys
 #   (your RAM will live to fight another day if you use this)
 #
 
-class Core50(Dataset):
+class Core50J(Core50):
     TRAIN_LENGTH = 119894
     TRAIN_MAP = {0: [0], 1: [0], 2: [0], 3: [0], 4: [0, 1], 5: [1], 6: [1], 7: [1, 2], 8: [2], 9: [2, 3], 10: [3],
                  11: [3, 4], 12: [4], 13: [4], 14: [4, 5], 15: [5], 16: [5, 6], 17: [6], 18: [6], 19: [6, 7], 20: [7],
                  21: [7, 8], 22: [8], 23: [8]}
     TEST_LENGTH  =  44972
 
-
-    """
-    Defines Tiny Imagenet as for the others pytorch datasets.
-    """
-    def __init__(self, root: str, train: bool=True, transform: transforms=None,
-                target_transform: transforms=None, download: bool=False) -> None:
-        self.not_aug_transform = transforms.Compose([transforms.ToTensor()])
-        self.root = root
-        self.train = train
-        self.transform = transform
-        self.target_transform = target_transform
-        self.download = download
-
-        if download:
-            if os.path.isdir(root) and len(os.listdir(root)) > 0:
-                print('Download not needed, files already on disk.')
-            else:
-                from google_drive_downloader import GoogleDriveDownloader as gdd
-
-                # https://drive.google.com/file/d/1rm2gE74AeEXaHRP8tHvtYnmokZ5Td-Yb
-                print('Downloading dataset')
-                gdd.download_file_from_google_drive(
-                    file_id='1rm2gE74AeEXaHRP8tHvtYnmokZ5Td-Yb',
-
-                    dest_path=os.path.join(root, 'core-50-processed.zip'),
-                    unzip=True)
-
-        self.targets = []
-        for num in range(24 if self.train else 9):
-            self.targets.append(np.load(os.path.join(
-                self.root, 'processed/y_%s_%02d.npy' %
-                      ('train' if self.train else 'test', num))))
-        self.targets = np.concatenate(np.array(self.targets))
-        print("TARGETS SHAPE:", self.targets.shape, file=sys.stderr)
-
-        # placeholder
-        self.data = np.arange(self.TRAIN_LENGTH if self.train else self.TEST_LENGTH)
-        self.loaded_data = {}
-        self.in_memory = []
 
     def __len__(self):
         return len(self.targets)
@@ -114,7 +76,7 @@ class Core50(Dataset):
         return img, target
 
 
-class MyCore50(Core50):
+class MyCore50(Core50J):
     """
     Defines Tiny Imagenet as for the others pytorch datasets.
     """

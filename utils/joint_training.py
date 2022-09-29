@@ -16,6 +16,66 @@ import numpy as np
 import sys
 from copy import deepcopy
 
+task_mask = torch.tensor([
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+    [1] * 10 + [0] * 40,
+
+    [0] * 10 + [1] * 5 + [0] * 35,
+    [0] * 10 + [1] * 5 + [0] * 35,
+    [0] * 10 + [1] * 5 + [0] * 35,
+    [0] * 10 + [1] * 5 + [0] * 35,
+    [0] * 10 + [1] * 5 + [0] * 35,
+
+    [0] * 15 + [1] * 5 + [0] * 30,
+    [0] * 15 + [1] * 5 + [0] * 30,
+    [0] * 15 + [1] * 5 + [0] * 30,
+    [0] * 15 + [1] * 5 + [0] * 30,
+    [0] * 15 + [1] * 5 + [0] * 30,
+
+    [0] * 20 + [1] * 5 + [0] * 25,
+    [0] * 20 + [1] * 5 + [0] * 25,
+    [0] * 20 + [1] * 5 + [0] * 25,
+    [0] * 20 + [1] * 5 + [0] * 25,
+    [0] * 20 + [1] * 5 + [0] * 25,
+
+    [0] * 25 + [1] * 5 + [0] * 20,
+    [0] * 25 + [1] * 5 + [0] * 20,
+    [0] * 25 + [1] * 5 + [0] * 20,
+    [0] * 25 + [1] * 5 + [0] * 20,
+    [0] * 25 + [1] * 5 + [0] * 20,
+
+    [0] * 30 + [1] * 5 + [0] * 15,
+    [0] * 30 + [1] * 5 + [0] * 15,
+    [0] * 30 + [1] * 5 + [0] * 15,
+    [0] * 30 + [1] * 5 + [0] * 15,
+    [0] * 30 + [1] * 5 + [0] * 15,
+
+    [0] * 35 + [1] * 5 + [0] * 10,
+    [0] * 35 + [1] * 5 + [0] * 10,
+    [0] * 35 + [1] * 5 + [0] * 10,
+    [0] * 35 + [1] * 5 + [0] * 10,
+    [0] * 35 + [1] * 5 + [0] * 10,
+    
+    [0] * 40 + [1] * 5 + [0] * 5,
+    [0] * 40 + [1] * 5 + [0] * 5,
+    [0] * 40 + [1] * 5 + [0] * 5,
+    [0] * 40 + [1] * 5 + [0] * 5,
+    [0] * 40 + [1] * 5 + [0] * 5,
+
+    [0] * 45 + [1] * 5,
+    [0] * 45 + [1] * 5,
+    [0] * 45 + [1] * 5,
+    [0] * 45 + [1] * 5,
+    [0] * 45 + [1] * 5
+])
 
 def evaluate(model: ContinualModel, test_loader: DataLoader, net=None):
     """
@@ -25,22 +85,26 @@ def evaluate(model: ContinualModel, test_loader: DataLoader, net=None):
     :return: a tuple of lists, containing the class-il
              and task-il accuracy for each task
     """
+    global task_mask
     if net is None:
         net = model.net
     mode = net.training
     net.eval()
-    correct, total = 0, 0
+    correct, correct_mask, total = 0, 0, 0
     for data in test_loader:
         inputs, labels = data
         inputs, labels = inputs.to(model.device), labels.to(model.device)
         outputs = net(inputs)
 
         _, pred = torch.max(outputs.data, 1)
-        correct += torch.sum(pred == labels).item()
+        task_mask = task_mask.to(model.device)
+        _, pred_mask = torch.max(outputs.data * task_mask[labels], 1)
+        correct      += torch.sum(pred      == labels).item()
+        correct_mask += torch.sum(pred_mask == labels).item()
         total += labels.shape[0]
 
     net.train(mode)
-    return (correct / total * 100, correct / total * 100)
+    return (correct / total * 100, correct_mask / total * 100)
 
 
 def train(model: ContinualModel, dataset: ContinualDataset,
@@ -87,6 +151,7 @@ def train(model: ContinualModel, dataset: ContinualDataset,
             print('skipping epoch', epoch, file=sys.stderr)
             continue
         for i, data in enumerate(train_loader):
+            if i > 3: continue
             if epoch < model_stash['epoch_idx'] and i < model_stash['batch_idx']:
                 print('batch', epoch, file=sys.stderr)
                 continue
@@ -106,7 +171,7 @@ def train(model: ContinualModel, dataset: ContinualDataset,
 
         if epoch and not epoch % 50 or epoch == args.n_epochs - 1:
             accs = evaluate(model, test_loader)
-            print('\nAccuracy after {} epochs: {}'.format(epoch + 1, accs[0]))
+            print('\nAccuracy after {} epochs: {} - Task-IL {}'.format(epoch + 1, accs[0], accs[1]))
             model_stash['mean_accs'].append(accs[0])
             if args.csv_log:
                 csv_logger.log(np.array(accs))

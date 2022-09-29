@@ -44,20 +44,18 @@ class Core50(Dataset):
             if os.path.isdir(root) and len(os.listdir(root)) > 0:
                 print('Download not needed, files already on disk.')
             else:
-                from google_drive_downloader import GoogleDriveDownloader as gdd
+                from onedrivedownloader import download
 
                 #https://drive.google.com/file/d/1rbmWYKX1bCZQJ0EnwX_sA0_PvicFcIu7
                 print('Downloading dataset')
-                gdd.download_file_from_google_drive(
-                    file_id='1rbmWYKX1bCZQJ0EnwX_sA0_PvicFcIu7',
-
-                    dest_path=os.path.join(root, 'core-50-processed.zip'),
-                    unzip=True)
+                ln = "https://unimore365-my.sharepoint.com/:u:/g/personal/263133_unimore_it/EUBQQGpFW2hKrc3PlOybvyoBWZE29lqqUPQUDdmV_XqRpg?e=XpQ6lm"
+                print('Downloading dataset')
+                download(ln, filename=os.path.join(root, 'core-50-processed.zip'), unzip=True, unzip_path=root, clean=True)
 
         self.targets = []
         for num in range(24 if self.train else 9):
             self.targets.append(np.load(os.path.join(
-                self.root, 'CORE50/processed/y_%s_%02d.npy' %
+                self.root, 'processed/y_%s_%02d.npy' %
                       ('train' if self.train else 'test', num))))
         self.targets = np.concatenate(np.array(self.targets))
         self.data = np.arange(self.TRAIN_LENGTH if self.train else self.TEST_LENGTH)
@@ -99,7 +97,7 @@ class Core50(Dataset):
                             self.loaded_data[b] = np.load(os.path.join(self.root, 'CORE50/processed/x_train_%02d.npy' % b))
                             self.in_memory.append(b)
                     else:
-                        self.loaded_data[memory_bank_index] = np.load(os.path.join(self.root, 'CORE50/processed/x_train_%02d.npy' % memory_bank_index))
+                        self.loaded_data[memory_bank_index] = np.load(os.path.join(self.root, 'processed/x_train_%02d.npy' % memory_bank_index))
                         self.in_memory.append(memory_bank_index)
 
                 else:
@@ -108,7 +106,7 @@ class Core50(Dataset):
                         del self.loaded_data[self.in_memory[0]]
                         self.in_memory = self.in_memory[1:]
 
-                    self.loaded_data[memory_bank_index] = np.load(os.path.join(self.root, 'CORE50/processed/x_test_%02d.npy' % memory_bank_index))
+                    self.loaded_data[memory_bank_index] = np.load(os.path.join(self.root, 'processed/x_test_%02d.npy' % memory_bank_index))
                     self.in_memory.append(memory_bank_index)
 
             else:
